@@ -69,6 +69,9 @@ reg_tg_username_str:
 reg_gender_str:
 	.ascii "Enter gender (m (male), f (female), h (hidden)): "
 	.byte 0x0
+reg_invalid_gender_str:
+	.ascii "Invalid gender! Please enter the correct option!\n"
+	.byte 0x0
 
 .section .text
 .global _start
@@ -280,9 +283,11 @@ do_add_member:
 	/*
 	 * What is your gender?
 	 */
+.Ldo_add_member__ask_gender:
 	leaq	reg_gender_str(%rip), %rdi
 	callq	print
 	leaq	ST_OFF_GENDER(%rbx), %rdi
+	movq	%rdi, %r12
 	/*
 	 * Prone input!
 	 *
@@ -292,7 +297,17 @@ do_add_member:
 	 */
 	movl	$(ST_SIZEOF_GENDER + 3), %esi
 	callq	read_stdin
-
+	movq	%r12, %rdi
+	cmpb	$'f', (%rdi)
+	je	.Ldo_add_member__input_ok
+	cmpb	$'m', (%rdi)
+	je	.Ldo_add_member__input_ok
+	cmpb	$'h', (%rdi)
+	je	.Ldo_add_member__input_ok
+	leaq	reg_invalid_gender_str(%rip), %rdi
+	callq	print
+	jmp	.Ldo_add_member__ask_gender
+.Ldo_add_member__input_ok:
 	/* TODO: Add validation and save the struct into a file. */
 
 	movq	%rbp, %rsp
