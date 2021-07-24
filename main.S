@@ -246,7 +246,7 @@ do_add_member:
 	pushq	%rbx
 	pushq	%r12
 	movq	%rsp, %rbp
-	subq	$((SIZEOF_STRUCT_MEMBER + 15ul) & -16ul), %rsp
+	subq	$((SIZEOF_STRUCT_MEMBER + 64ul) & -16ul), %rsp
 	STACK_ALIGNMENT_TRAP
 
 	// Start struct address.
