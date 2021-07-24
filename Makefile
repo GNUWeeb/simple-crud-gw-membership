@@ -31,4 +31,4 @@ main: src/main.o
 	$(CC) $(CFLAGS) -nostartfiles -static $(^) -o $(@)
 
 clean:
-	$(RM) -vf main src/main.o src/const.o
+	$(RM) -vf main src/main.o src/const.o src/const

@@ -5,4 +5,4 @@
 *.tmp
 *.lock
 /main
-/const
+/src/const
