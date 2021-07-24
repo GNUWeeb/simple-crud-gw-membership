@@ -12,11 +12,23 @@ CFLAGS = -Wall -Wextra
 
 all: main
 
-main.o: main.S
+src/const.o: src/const.c
 	$(CC) $(CFLAGS) -c $(^) -o $(@)
 
-main: main.o
+src/const: src/const.o
+	$(CC) $(CFLAGS) $(^) -o $(@)
+
+src/__const.S: src/const
+	src/const > src/__const.S
+
+src/main.S: src/__const.S
+
+
+src/main.o: src/main.S
+	$(CC) $(CFLAGS) -c $(<) -o $(@)
+
+main: src/main.o
 	$(CC) $(CFLAGS) -nostartfiles -static $(^) -o $(@)
 
 clean:
-	$(RM) -vf main.o main
+	$(RM) -vf main src/main.o src/const.o

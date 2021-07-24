@@ -6,7 +6,6 @@
  * Copyright (C) 2021  Ammar Faizi
  */
 
-
 /*
  *
  * struct member {
@@ -17,7 +16,10 @@
  *
  */
 
+
+#include "__const.S"
 #define STACK_ALIGNMENT_TRAP	movdqa	(%rsp), %xmm0
+
 
 /*
  * Offset info.
