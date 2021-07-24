@@ -1,0 +1,7 @@
+*.o
+*.so
+*.swo
+*.swp
+*.tmp
+*.lock
+/main
