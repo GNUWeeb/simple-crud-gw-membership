@@ -1,7 +1,8 @@
 
 # Simple CRUD GNU/Weeb Membership
 This is a simple CRUD (Create, Read, Update, Delete) program written in Assembly
-x86-64, specifically for Linux with System V AMD64 ABI calling convention.
+x86-64, specifically for Linux with System V AMD64 ABI calling convention. It's
+still under development.
 
 ![screenshot.jpg](https://raw.githubusercontent.com/GNUWeeb/simple-crud-gw-membership/master/screenshot.jpg)
 
