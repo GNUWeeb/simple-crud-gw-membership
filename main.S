@@ -3,7 +3,7 @@
  * @author Ammar Faizi <ammarfaizi2@gmail.com> https://www.facebook.com/ammarfaizi2
  * @license GNU GPL-2.0
  *
- * 2021
+ * Copyright (C) 2021  Ammar Faizi
  */
 
 #define STACK_ALIGNMENT_TRAP	movdqa	(%rsp), %xmm0
