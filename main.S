@@ -6,15 +6,40 @@
  * Copyright (C) 2021  Ammar Faizi
  */
 
+
+/*
+ *
+ * struct member {
+ * 	char	name[64];		// Name
+ * 	char	tg_username[32];	// Telegram username
+ * 	char	gender;			// m (male), f (female), h (hidden)
+ * };
+ *
+ */
+
 #define STACK_ALIGNMENT_TRAP	movdqa	(%rsp), %xmm0
 
+/*
+ * Offset info.
+ */
+#define ST_OFF_NAME		(0)
+#define ST_OFF_TG_USERNAME	(64)
+#define ST_OFF_GENDER		(64 + 32)
+
+/*
+ * Size info.
+ */
+#define ST_SIZEOF_NAME		(64)
+#define ST_SIZEOF_TG_USERNAME	(32)
+#define ST_SIZEOF_GENDER	(1)
+#define SIZEOF_STRUCT_MEMBER	(64 + 32 + 1)
 
 .section .rodata
 menu_str:
 	.ascii "========================================================\n"
 	.ascii "====     Welcome to GNU/Weeb Member DB Software     ====\n"
 	.ascii "========================================================\n"
-	.ascii "\t1. [C] Register a new member\n"
+	.ascii "\t1. [C] Add a new member\n"
 	.ascii "\t2. [R] Show members\n"
 	.ascii "\t3. [U] Update a member\n"
 	.ascii "\t4. [D] Delete a member\n"
@@ -31,6 +56,19 @@ hang_until_enter_str:
 	.byte 0x0
 clear_screen_bytes:
 	.byte 0x1b, 0x63, 0x00
+
+reg_start_str:
+	.ascii "======== Add a new member ========\n"
+	.byte 0x0
+reg_name_str:
+	.ascii "Enter name: "
+	.byte 0x0
+reg_tg_username_str:
+	.ascii "Enter Telegram username: "
+	.byte 0x0
+reg_gender_str:
+	.ascii "Enter gender (m (male), f (female), h (hidden)): "
+	.byte 0x0
 
 .section .text
 .global _start
@@ -59,6 +97,7 @@ main:
 	testl	%eax, %eax
 	js	.Lmain__invalid_menu
 	cmpl	$1, %eax
+	je	.Lmain__do_add_member
 	cmpl	$2, %eax
 	cmpl	$3, %eax
 	cmpl	$4, %eax
@@ -66,8 +105,13 @@ main:
 	je	.Lmain__out
 	jmp	.Lmain__show_menu
 
+.Lmain__do_add_member:
+	callq	do_add_member
+	jmp	.Lmain__hang
+
 .Lmain__invalid_menu:
 	callq	show_invalid_menu_alert
+.Lmain__hang:
 	callq	hang_until_enter
 	jmp	.Lmain__show_menu
 .Lmain__out:
@@ -192,5 +236,67 @@ hang_until_enter:
 	movl	$128, %esi
 	callq	read_stdin
 	movq	%rbp, %rsp
+	popq	%rbp
+	retq
+
+
+// void do_add_member(void);
+do_add_member:
+	pushq	%rbp
+	pushq	%rbx
+	pushq	%r12
+	movq	%rsp, %rbp
+	subq	$((SIZEOF_STRUCT_MEMBER + 15ul) & -16ul), %rsp
+	STACK_ALIGNMENT_TRAP
+
+	// Start struct address.
+	leaq	-((SIZEOF_STRUCT_MEMBER + 64ul) & -16ul)(%rbp), %rbx
+
+	callq	clear_screen
+
+	leaq	reg_start_str(%rip), %rdi
+	callq	print
+
+	/*
+	 * What is your name?
+	 */
+	leaq	reg_name_str(%rip), %rdi
+	callq	print
+	leaq	ST_OFF_NAME(%rbx), %rdi
+	movl	$ST_SIZEOF_NAME, %esi
+	callq	read_stdin
+
+
+	/*
+	 * What is your Telegram username?
+	 */
+	leaq	reg_tg_username_str(%rip), %rdi
+	callq	print
+	leaq	ST_OFF_TG_USERNAME(%rbx), %rdi
+	movl	$ST_SIZEOF_NAME, %esi
+	callq	read_stdin
+
+
+	/*
+	 * What is your gender?
+	 */
+	leaq	reg_gender_str(%rip), %rdi
+	callq	print
+	leaq	ST_OFF_GENDER(%rbx), %rdi
+	/*
+	 * Prone input!
+	 *
+	 * We need to at least read 2 chars.
+	 * Make sure we have allocated enough space
+	 * after the struct area.
+	 */
+	movl	$(ST_SIZEOF_GENDER + 3), %esi
+	callq	read_stdin
+
+	/* TODO: Add validation and save the struct into a file. */
+
+	movq	%rbp, %rsp
+	popq	%r12
+	popq	%rbx
 	popq	%rbp
 	retq
