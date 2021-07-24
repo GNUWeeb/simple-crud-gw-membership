@@ -7,6 +7,18 @@ still under development.
 ![screenshot.jpg](https://raw.githubusercontent.com/GNUWeeb/simple-crud-gw-membership/master/screenshot.jpg)
 
 
+# Setup
+```
+sudo apt-get install gcc make -y;
+git clone https://github.com/GNUWeeb/simple-crud-gw-membership;
+cd simple-crud-gw-membership;
+make;
+
+# Run the program
+./main;
+```
+
+
 # Data Structure
 In this program, we use the following struct layout to store the record.
 ```c
